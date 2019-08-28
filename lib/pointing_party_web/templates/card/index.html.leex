@@ -2,7 +2,7 @@
   <div class="card-container col-10">
     <%= if !@is_pointing do %>
       <div class="col-md-4 text-center">
-        <button class="btn-primary">Start the Party!</button>
+        <button class="btn-primary" phx-click="start_party">Start the Party!</button>
       </div>
     <% else %>
       <div class="card text-left">
@@ -11,7 +11,7 @@
         </div>
         <div class="card-body">
           <p class="card-text"><%= @current_card.description %></p>
-          <form class="form-group text-left points-container">
+          <form phx-submit="vote_submit" class="form-group text-left points-container">
             <div class="form-row align-items-center">
               <div class="col-2">
                 <label for="story-points">Story Points</label>
@@ -26,7 +26,7 @@
 
             <%= if @outcome == "winner" do %>
               <p>Winner: <%= @point_tally %> Points</p>
-              <button class="btn btn-primary">
+              <button class="btn btn-primary" phx-click="next_card" phx-value=<%= @point_tally %>>
                 Next Card
               </button>
             <% end %>
@@ -34,17 +34,17 @@
             <%= if @outcome == "tie" do %>
               <p>TIE!</p>
 
-              <button class="btn btn-primary">
+              <button class="btn btn-primary" phx-click="next_card" phx-value=<%= List.first(@point_tally) %> >
                 Pick <%= List.first(@point_tally) %>
               </button>
 
-              <button class="btn btn-primary">
+              <button class="btn btn-primary" phx-click="next_card" phx-value=<%= List.last(@point_tally) %> >
                 Pick <%= List.last(@point_tally) %>
               </button>
             <% end %>
 
             <%= if @outcome == nil do %>
-              <button class="btn btn-primary">Vote!</button>
+              <button class="btn btn-primary" >Vote!</button>
             <% end %>
           </form>
         </div>
@@ -57,8 +57,14 @@
     <dl class="row users">
       <%= for {name, %{metas: [metas]}} <- @users do %>
         <dt class="col-8"><%= name %></dt>
-        <dd></dd>
+        <dd><%= if metas.points, do: "✓", else: "" %></dd>
       <% end %>
     </dl>
+    <%= for joiner <- @joiners do %>
+        <p> <%= joiner %> has joined the party </p>
+    <% end %> 
+    <%= for leaver <- @leavers do %>
+      <p> <%= leaver %> has left the party </p>
+    <% end %>
   </div>
 </div>
